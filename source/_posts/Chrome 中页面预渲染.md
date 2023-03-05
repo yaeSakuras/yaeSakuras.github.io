@@ -213,6 +213,8 @@ function pagePrerendered() {
 
 查看页面是否已预呈现的最简单方法是在预呈现发生后打开 DevTools，然后在控制台中键入 `performance.getEntriesByType('navigation')[0].activationStart`。 如果返回非零值，则您知道该页面已预呈现：
 
+![](https://zzh-cat.oss-cn-beijing.aliyuncs.com/assets/2023-03-05-03.png)
+
 当页面被查看页面的用户激活时，将在文档上调度 `prerenderingchange` 事件，然后可以使用该事件启用以前默认在页面加载时启动但您希望延迟到页面加载的活动用户实际查看。
 
 使用这些 API，JavaScript 可以适当地检测 prerendered 页面并对其采取行动。
