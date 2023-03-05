@@ -1,5 +1,6 @@
 ---
 title: 你可能并不需要 useEffect
+date: 2023-02-19
 ---
 最近冲浪🏄看到去年 [BeJS](https://www.bejs.io/) conf 中一个关于 react 相关的视频，标题是 **Goodbye, useEffect**。然后又联想到新版 react doc 中有一节标题是 **You Might Not Need an Effect**，确实有必要再来看看这个 `useEffect`。 
 

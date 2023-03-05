@@ -1,5 +1,6 @@
 ---
 title: WireGuard 客户端的安装与配置使用
+date: 2023-02-20
 ---
 
 记录 mac os 下安装 WireGuard 的使用过程
