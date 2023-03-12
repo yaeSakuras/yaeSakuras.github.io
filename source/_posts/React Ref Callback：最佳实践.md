@@ -1,3 +1,8 @@
+---
+title: React Ref Callback：最佳实践
+date: 2023-03-12
+---
+
 “Ref” 在 React 中有两个相关的含义，令人困惑。因此，在我们开始之前，让我们先搞清楚这一点。
 
 1. `useRef` 钩子返回的“ref对象”是一个普通的JavaScript对象，它只有一个名为 `current` 的属性，您可以读取或将其设置为任何值。
