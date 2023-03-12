@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="“Ref” 在 React 中有两个相关的含义，令人困惑。因此，在我们开始之前，让我们先搞清楚这一点。  useRef 钩子返回的“ref对象”是一个普通的JavaScript对象，它只有一个名为 current 的属性，您可以读取或将其设置为任何值。 宿主元素——代表 DOM 元素的 JSX ——具有特殊的“ref属性”，可用于访问其对应的 DOM 元素。  这两个通常一起使用，“ref 对象”">
+<meta property="og:type" content="article">
+<meta property="og:title" content="React Ref Callback：最佳实践">
+<meta property="og:url" content="https://yaesakuras.github.io/2023/03/11/React%20Ref%20Callback%EF%BC%9A%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/index.html">
+<meta property="og:site_name" content="Teyvat">
+<meta property="og:description" content="“Ref” 在 React 中有两个相关的含义，令人困惑。因此，在我们开始之前，让我们先搞清楚这一点。  useRef 钩子返回的“ref对象”是一个普通的JavaScript对象，它只有一个名为 current 的属性，您可以读取或将其设置为任何值。 宿主元素——代表 DOM 元素的 JSX ——具有特殊的“ref属性”，可用于访问其对应的 DOM 元素。  这两个通常一起使用，“ref 对象”">
+<meta property="og:locale">
+<meta property="article:published_time" content="2023-03-11T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-03-11T16:00:00.000Z">
+<meta property="article:author" content="grafield">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>React Ref Callback：最佳实践</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2023/03/01/Chrome%20%E4%B8%AD%E9%A1%B5%E9%9D%A2%E9%A2%84%E6%B8%B2%E6%9F%93/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://yaesakuras.github.io/2023/03/11/React%20Ref%20Callback%EF%BC%9A%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://yaesakuras.github.io/2023/03/11/React%20Ref%20Callback%EF%BC%9A%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/&text=React Ref Callback：最佳实践"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://yaesakuras.github.io/2023/03/11/React%20Ref%20Callback%EF%BC%9A%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/&title=React Ref Callback：最佳实践"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://yaesakuras.github.io/2023/03/11/React%20Ref%20Callback%EF%BC%9A%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/&is_video=false&description=React Ref Callback：最佳实践"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=React Ref Callback：最佳实践&body=Check out this article: https://yaesakuras.github.io/2023/03/11/React%20Ref%20Callback%EF%BC%9A%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://yaesakuras.github.io/2023/03/11/React%20Ref%20Callback%EF%BC%9A%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/&title=React Ref Callback：最佳实践"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://yaesakuras.github.io/2023/03/11/React%20Ref%20Callback%EF%BC%9A%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/&title=React Ref Callback：最佳实践"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://yaesakuras.github.io/2023/03/11/React%20Ref%20Callback%EF%BC%9A%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/&title=React Ref Callback：最佳实践"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://yaesakuras.github.io/2023/03/11/React%20Ref%20Callback%EF%BC%9A%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/&title=React Ref Callback：最佳实践"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://yaesakuras.github.io/2023/03/11/React%20Ref%20Callback%EF%BC%9A%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/&name=React Ref Callback：最佳实践&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://yaesakuras.github.io/2023/03/11/React%20Ref%20Callback%EF%BC%9A%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/&t=React Ref Callback：最佳实践"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#ref-Callback"><span class="toc-number">1.</span> <span class="toc-text">ref Callback</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="toc-number">2.</span> <span class="toc-text">使用场景</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E5%BD%93-DOM-%E5%85%83%E7%B4%A0%E6%8C%82%E8%BD%BD%E6%97%B6%E6%BB%9A%E5%8A%A8%E5%88%B0%E8%AF%A5%E5%85%83%E7%B4%A0"><span class="toc-number">2.1.</span> <span class="toc-text">1. 当 DOM 元素挂载时滚动到该元素</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E5%BD%93-DOM-%E5%85%83%E7%B4%A0%E5%8F%98%E5%8C%96%E6%97%B6%E7%9A%84%E9%87%8D%E6%96%B0%E6%B8%B2%E6%9F%93"><span class="toc-number">2.2.</span> <span class="toc-text">2. 当 DOM 元素变化时的重新渲染</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B5%8B%E9%87%8F-DOM-%E5%85%83%E7%B4%A0"><span class="toc-number">2.2.1.</span> <span class="toc-text">测量 DOM 元素</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E5%9C%A8-render-%E4%B8%AD%E8%AE%BF%E9%97%AE-DOM-%E5%85%83%E7%B4%A0"><span class="toc-number">2.3.</span> <span class="toc-text">3. 在 render 中访问 DOM 元素</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#React-Portal"><span class="toc-number">2.3.1.</span> <span class="toc-text">React Portal</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E5%85%B1%E4%BA%AB-DOM-Ref"><span class="toc-number">2.4.</span> <span class="toc-text">4. 共享 DOM Ref</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">3.</span> <span class="toc-text">总结</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        React Ref Callback：最佳实践
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">grafield</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2023-03-11T16:00:00.000Z" itemprop="datePublished">2023-03-12</time>
+        
+      
+    </div>
+
+
+      
+
+      
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <p>“Ref” 在 React 中有两个相关的含义，令人困惑。因此，在我们开始之前，让我们先搞清楚这一点。</p>
+<ol>
+<li><code>useRef</code> 钩子返回的“ref对象”是一个普通的JavaScript对象，它只有一个名为 <code>current</code> 的属性，您可以读取或将其设置为任何值。</li>
+<li>宿主元素——代表 DOM 元素的 JSX ——具有特殊的“ref属性”，可用于访问其对应的 DOM 元素。</li>
+</ol>
+<p>这两个通常一起使用，“ref 对象”可以传递给“ref 属性”，React 将把对 DOM 元素的引用设置为其当前属性。</p>
+<h2 id="ref-Callback"><a href="#ref-Callback" class="headerlink" title="ref Callback"></a>ref Callback</h2><p>除了 ref 对象之外，ref 属性还接受一个函数；即 ref 回调。它的唯一参数是对渲染后的 DOM 元素的引用。</p>
+<p>像 effect 函数一样，React 在组件的生命周期中的特定时刻调用它。ref 回调在附加的 DOM 元素创建后立即被调用，并在元素被移除时再次使用 null 调用。</p>
+<p>如果一个 ref 回调函数被定义为内联函数，React 将在每次渲染时调用它两次，首先是 null，然后是 DOM 元素。有关此的更多信息，请参见下面的 ref 回调注意事项。</p>
+<blockquote>
+<p>被调用两次的内联引用回调可能看起来令人惊讶，我认为从 React 的角度来看，这种行为是有意义的，它确保了一致性。每个渲染都会创建一个函数的新实例。它可能是一个完全不同的函数，或者该函数可能关闭了在此期间可能已经改变的 <code>props</code> 或 <code>state</code>。因此，React需要清除旧的引用回调（用 <code>null</code> 调用它），然后设置新的（用 DOM 元素调用它）。这允许您有条件地附加引用，甚至在 React 元素之间交换它们。这可能会导致它被不必要地调用。大多数时候，这没什么大不了的，在某些情况下，这可能不是你想要的。您可以通过在 <code>useCallback</code> 中包装 ref 回调或将函数移出组件来避免此行为。</p>
+</blockquote>
+<p>由于 ref 回调在渲染后被调用，因此可以安全地在其中执行副作用。</p>
+<h2 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h2><p>在 React Docs 中关于 ref callback 的内容较少。也许是他们故意不去讨论它，因为它的使用场景非常少，访问 DOM 元素的场景并不多见。</p>
+<p>ref callback 绝对是 React 的一个小众功能，你不会每天都需要它。尽管如此，它确实有一些合法的用例，否则就不会出现在 React 中！因此让我们看一些用例。</p>
+<p>仅当您需要底层的 DOM 元素时，才需要使用 ref callback。那么 ref callback 何时有用？</p>
+<blockquote>
+<p>当您想在 React 将 ref 附加或分离到 DOM 元素时执行操作时，请使用 ref callback。</p>
+</blockquote>
+<p>据我所知，这归结为以下四种情况。</p>
+<ol>
+<li>当元素挂载或更新时，调用 DOM 元素实例方法执行副作用。</li>
+<li>当 DOM 元素的某个属性发生变化时，“通知” 并重新渲染。</li>
+<li>将 DOM 元素设置到 state 中，以便在渲染期间访问它。</li>
+<li>共享 DOM 元素，使用 DOM 元素执行多项操作。</li>
+</ol>
+<p>现在，让我们具体来看看每一个场景。</p>
+<h3 id="1-当-DOM-元素挂载时滚动到该元素"><a href="#1-当-DOM-元素挂载时滚动到该元素" class="headerlink" title="1. 当 DOM 元素挂载时滚动到该元素"></a>1. 当 DOM 元素挂载时滚动到该元素</h3><p>您可以在挂载时使用 ref callback 调用 DOM 元素实例方法，以执行诸如滚动或聚焦等 DOM 副作用。例如，自动滚动到列表中的最后一项：</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// On first render and on unmount there </span></span><br><span class="line"><span class="comment">// is no DOM element so `el` will be `null` </span></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">scrollTo</span> = (<span class="params">el</span>) =&gt; &#123;</span><br><span class="line">  <span class="keyword">if</span> (el) &#123;</span><br><span class="line">    el.<span class="title function_">scrollIntoView</span>(&#123; <span class="attr">behavior</span>: <span class="string">&quot;smooth&quot;</span> &#125;);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">List</span>(<span class="params">&#123; data &#125;</span>) &#123;</span><br><span class="line">  <span class="keyword">return</span> (</span><br><span class="line">    <span class="language-xml"><span class="tag">&lt;<span class="name">ul</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">      &#123;data.map((d, i) =&gt; &#123;</span></span><br><span class="line"><span class="language-xml">        const isLast = i === data.length - 1;</span></span><br><span class="line"><span class="language-xml">        return (</span></span><br><span class="line"><span class="language-xml">          <span class="tag">&lt;<span class="name">li</span></span></span></span><br><span class="line"><span class="tag"><span class="language-xml">            <span class="attr">key</span>=<span class="string">&#123;d.name&#125;</span></span></span></span><br><span class="line"><span class="tag"><span class="language-xml">            // <span class="attr">ref</span> <span class="attr">callback</span> <span class="attr">to</span> <span class="attr">scroll</span> <span class="attr">to</span> <span class="attr">the</span> <span class="attr">last</span> <span class="attr">list</span> <span class="attr">element</span></span></span></span><br><span class="line"><span class="tag"><span class="language-xml">            <span class="attr">ref</span>=<span class="string">&#123;isLast</span> ? <span class="attr">scrollTo</span> <span class="attr">:</span> <span class="attr">undefined</span>&#125;</span></span></span><br><span class="line"><span class="tag"><span class="language-xml">          &gt;</span></span></span><br><span class="line"><span class="language-xml">            &#123;d.name&#125;</span></span><br><span class="line"><span class="language-xml">          <span class="tag">&lt;/<span class="name">li</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">        );</span></span><br><span class="line"><span class="language-xml">      &#125;)&#125;</span></span><br><span class="line"><span class="language-xml">    <span class="tag">&lt;/<span class="name">ul</span>&gt;</span></span></span><br><span class="line">  );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>记住，管理 DOM 是 React 的工作，避免执行 DOM 上的可变方法， 比如（<code>insert</code>,<code>remove</code>, <code>set</code>,<code>replace</code> 等），对于 <code>focus</code> 和 <code>scroll</code> 等非破坏性的操作则允许我们开发实现。</p>
+<p>请注意，浏览器不允许在没有用户交互的情况下调用某些 DOM 元素方法，例如 <a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/API/Element/requestFullscreen">requestFullscreen</a>。当在 ref callback 中调用此类受保护的方法时，它们将不起作用。</p>
+<h3 id="2-当-DOM-元素变化时的重新渲染"><a href="#2-当-DOM-元素变化时的重新渲染" class="headerlink" title="2. 当 DOM 元素变化时的重新渲染"></a>2. 当 DOM 元素变化时的重新渲染</h3><p>当您希望 React 知道某个 DOM 元素属性时，可以使用 ref callback。在 ref callback 中读取像滚动位置这样的 DOM 元素属性或调用提供有关该元素信息的方法（例如 <code>getBoundingClientRect()</code>），并将该信息设置到 state 中。</p>
+<h4 id="测量-DOM-元素"><a href="#测量-DOM-元素" class="headerlink" title="测量 DOM 元素"></a>测量 DOM 元素</h4><p>这是一段直接来自（旧）React 文档的片段：<a target="_blank" rel="noopener" href="https://reactjs.org/docs/hooks-faq.html#how-can-i-measure-a-dom-node">如何测量 DOM 节点</a>。这是 ref callback 的一个很好的例子，所以将其复制到这里。</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> [size, setSize] = <span class="title function_">useState</span>();</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> measureRef = <span class="title function_">useCallback</span>(<span class="function">(<span class="params">node</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="title function_">setSize</span>(node.<span class="title function_">getBoundingClientRect</span>());</span><br><span class="line">&#125;, []);</span><br><span class="line"></span><br><span class="line"><span class="keyword">return</span> <span class="language-xml"><span class="tag">&lt;<span class="name">div</span> <span class="attr">ref</span>=<span class="string">&#123;measureRef&#125;</span>&gt;</span>&#123;children&#125;<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p>在这个案例中，没有选择使用 <code>useRef</code>，因为当 ref 是一个对象时，它并不会把当前 ref 值的变化情况通知到我们。使用 callback ref 可以确保即便被测量的节点在子组件延迟显示 (比如为了响应一次点击)，我们依然能够在父组件接收到相关的信息，以便更新测量结果。注意到我们传递了 [] 作为 <code>useCallback</code> 的依赖列表。这确保了 ref callback 不会在再次渲染时改变，因此 React 不会在非必要的时候调用它。</p>
+<h3 id="3-在-render-中访问-DOM-元素"><a href="#3-在-render-中访问-DOM-元素" class="headerlink" title="3. 在 render 中访问 DOM 元素"></a>3. 在 render 中访问 DOM 元素</h3><p>如果在 ref 回调中将 DOM 元素设置到 <code>state</code>，它将触发新的渲染，因为这正是设置 <code>state</code> 的作用。但是它不会陷入无限渲染循环，因为 <code>setState</code> 是一个稳定的函数，因此 ref callback 仅在挂载和卸载时调用。</p>
+<p>在这种情况下，为什么我们不使用 <code>useRef</code> ？答案是，因为不允许在渲染过程中访问 ref 对象。对于渲染中的 DOM 元素，必须通过 state 来访问。</p>
+<h4 id="React-Portal"><a href="#React-Portal" class="headerlink" title="React Portal"></a>React Portal</h4><p>React portal 主要用于解决组件树和 DOM 树的结构之间不一致的问题。portal 将 DOM 树上不同位置上的组件连接到一起，最为常使用的场景就是将 Modal 弹窗覆盖整个视窗。</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Assume an empty div with id &#x27;modal&#x27; is in your HTML</span></span><br><span class="line"> <span class="keyword">const</span> modalEl = <span class="variable language_">document</span>.<span class="title function_">getElementById</span>(<span class="string">&quot;modal&quot;</span>);</span><br><span class="line"></span><br><span class="line"> <span class="keyword">function</span> <span class="title function_">Modal</span>(<span class="params">&#123; children, ...props &#125;</span>) &#123;</span><br><span class="line">   <span class="keyword">return</span> <span class="title class_">ReactDOM</span>.<span class="title function_">createPortal</span>(</span><br><span class="line">     <span class="language-xml"><span class="tag">&lt;<span class="name">ModalBase</span> &#123;<span class="attr">...props</span>&#125;&gt;</span></span></span><br><span class="line"><span class="language-xml">       &#123;children&#125;</span></span><br><span class="line"><span class="language-xml">     <span class="tag">&lt;/<span class="name">ModalBase</span>&gt;</span></span>,</span><br><span class="line">     modalEl</span><br><span class="line">   );</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以使用 <code>document.getElementById()</code> 来获取 DOM 元素，前提是你能保证它是存在的。或许你不想通过 HTML 来控制 Modal，而是希望能 portal 到一个 React 创建的 DOM 元素上。</p>
+<p>这就需要在进行 render 时访问到相应的 DOM 元素，使用 ref callback 可以实现这个功能。</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">Parent</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> [modalElement, setModalElement] = <span class="title function_">useState</span>(<span class="literal">null</span>);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> (</span><br><span class="line">    <span class="language-xml"><span class="tag">&lt;<span class="name">div</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">      <span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">&quot;modal-location&quot;</span> <span class="attr">ref</span>=<span class="string">&#123;setModalElement&#125;</span> /&gt;</span></span></span><br><span class="line"><span class="language-xml">      &#123;/* Imagine that the modal container and the</span></span><br><span class="line"><span class="language-xml">          Modal itself are farther apart in the component tree */&#125;</span></span><br><span class="line"><span class="language-xml">      <span class="tag">&lt;<span class="name">Modal</span> <span class="attr">modalElement</span>=<span class="string">&#123;modalElement&#125;</span>&gt;</span>Warning<span class="tag">&lt;/<span class="name">Modal</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line">  )</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">Modal</span>(<span class="params">&#123; children, modalElement, ...props &#125;</span>) &#123;</span><br><span class="line">  <span class="keyword">return</span> modalElement</span><br><span class="line">    ? <span class="title class_">ReactDOM</span>.<span class="title function_">createPortal</span>(</span><br><span class="line">        <span class="language-xml"><span class="tag">&lt;<span class="name">ModalBase</span> &#123;<span class="attr">...props</span>&#125;&gt;</span>&#123;children&#125;<span class="tag">&lt;/<span class="name">ModalBase</span>&gt;</span></span>,</span><br><span class="line">        modalElement</span><br><span class="line">      )</span><br><span class="line">    : <span class="literal">null</span>;</span><br></pre></td></tr></table></figure>
+
+<p>在最开始，modalElement 的值是 <code>null</code>，所以需要在创建 portal 之前做一下判断。</p>
+<h3 id="4-共享-DOM-Ref"><a href="#4-共享-DOM-Ref" class="headerlink" title="4. 共享 DOM Ref"></a>4. 共享 DOM Ref</h3><p>经常会出现不止一个消费者需要访问 DOM 元素。假设你想测量一个 <code>&lt;div&gt;</code> 的宽度，并将其交给另一个 React 之外的库来处理 DOM 内容。对于 React 来说，这样的元素就是一个黑盒。React 既不知道它的内部有什么，也不关心它是什么。这个元素完全交给另外一个库来管理。</p>
+<p>一个典型的例子就是使用 D3 或 <code>@observable/plot</code> 创建的响应式图标。在下面的例子中，我们会使用 <code>@observable/plot</code> 创建一个 plot，并且使用 react-use-measure 来计算元素的宽度。使用 ref callback 将 DOM 元素传递给它们俩：</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> useMeasure <span class="keyword">from</span> <span class="string">&quot;react-use-measure&quot;</span>;</span><br><span class="line"><span class="keyword">import</span> * <span class="keyword">as</span> <span class="title class_">Plot</span> <span class="keyword">from</span> <span class="string">&quot;@observablehq/plot&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">function</span> <span class="title function_">BoxPlot</span>(<span class="params">&#123; data &#125;</span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> [measureRef, &#123; width, height &#125;] = <span class="title function_">useMeasure</span>(&#123; <span class="attr">debounce</span>: <span class="number">5</span> &#125;);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> plotRef = useRef&lt;<span class="title class_">HTMLDivElement</span> | <span class="literal">null</span>&gt;(<span class="literal">null</span>);</span><br><span class="line"></span><br><span class="line">  <span class="title function_">useEffect</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> boxPlot = <span class="title class_">Plot</span>.<span class="title function_">plot</span>(&#123;</span><br><span class="line">      <span class="attr">width</span>: <span class="title class_">Math</span>.<span class="title function_">max</span>(<span class="number">150</span>, width),</span><br><span class="line">      <span class="attr">marks</span>: [</span><br><span class="line">        <span class="title class_">Plot</span>.<span class="title function_">boxX</span>(data),</span><br><span class="line">      ],</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">    plotRef.<span class="property">current</span>.<span class="title function_">append</span>(boxPlot);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="function">() =&gt;</span> boxPlot.<span class="title function_">remove</span>();</span><br><span class="line">  &#125;, [data, width]);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> initBoxPlot = <span class="title function_">useCallback</span>(<span class="function">(<span class="params">el: HTMLDivElement | <span class="literal">null</span></span>) =&gt;</span> &#123;</span><br><span class="line">    plotRef.<span class="property">current</span> = el;</span><br><span class="line">    <span class="title function_">measureRef</span>(el);</span><br><span class="line">  &#125;, []);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="language-xml"><span class="tag">&lt;<span class="name">div</span> <span class="attr">ref</span>=<span class="string">&#123;initBoxPlot&#125;</span> /&gt;</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ul>
+<li>ref callback 是一个传递给元素的 ref 属性的函数。React 会在组件挂载时调用它，这时的参数是 DOM 元素；当组件卸载的时候也会调用它，这时的参数是 <code>null</code></li>
+<li>当你设置不同的 ref callback 时，React 也会调用 ref callback</li>
+<li>切换绑定和取消绑定 ref 到一个 DOM 元素，ref callback 可以让我们实现特定的操作</li>
+<li>ref callback 可以用来做以下事情</li>
+<li>操作 DOM，比如在组件挂载的时候滚动或聚焦</li>
+<li>在 React 获取 DOM 属性，比如宽度或滚动位置</li>
+<li>在 React 控制的 DOM 元素上使用 Portal</li>
+<li>非受控复合组件是一个很强大的模式</li>
+<li>将 DOM 元素提供给多个消费者</li>
+</ul>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#ref-Callback"><span class="toc-number">1.</span> <span class="toc-text">ref Callback</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="toc-number">2.</span> <span class="toc-text">使用场景</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E5%BD%93-DOM-%E5%85%83%E7%B4%A0%E6%8C%82%E8%BD%BD%E6%97%B6%E6%BB%9A%E5%8A%A8%E5%88%B0%E8%AF%A5%E5%85%83%E7%B4%A0"><span class="toc-number">2.1.</span> <span class="toc-text">1. 当 DOM 元素挂载时滚动到该元素</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E5%BD%93-DOM-%E5%85%83%E7%B4%A0%E5%8F%98%E5%8C%96%E6%97%B6%E7%9A%84%E9%87%8D%E6%96%B0%E6%B8%B2%E6%9F%93"><span class="toc-number">2.2.</span> <span class="toc-text">2. 当 DOM 元素变化时的重新渲染</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B5%8B%E9%87%8F-DOM-%E5%85%83%E7%B4%A0"><span class="toc-number">2.2.1.</span> <span class="toc-text">测量 DOM 元素</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E5%9C%A8-render-%E4%B8%AD%E8%AE%BF%E9%97%AE-DOM-%E5%85%83%E7%B4%A0"><span class="toc-number">2.3.</span> <span class="toc-text">3. 在 render 中访问 DOM 元素</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#React-Portal"><span class="toc-number">2.3.1.</span> <span class="toc-text">React Portal</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E5%85%B1%E4%BA%AB-DOM-Ref"><span class="toc-number">2.4.</span> <span class="toc-text">4. 共享 DOM Ref</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">3.</span> <span class="toc-text">总结</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://yaesakuras.github.io/2023/03/11/React%20Ref%20Callback%EF%BC%9A%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://yaesakuras.github.io/2023/03/11/React%20Ref%20Callback%EF%BC%9A%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/&text=React Ref Callback：最佳实践"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://yaesakuras.github.io/2023/03/11/React%20Ref%20Callback%EF%BC%9A%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/&title=React Ref Callback：最佳实践"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://yaesakuras.github.io/2023/03/11/React%20Ref%20Callback%EF%BC%9A%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/&is_video=false&description=React Ref Callback：最佳实践"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=React Ref Callback：最佳实践&body=Check out this article: https://yaesakuras.github.io/2023/03/11/React%20Ref%20Callback%EF%BC%9A%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://yaesakuras.github.io/2023/03/11/React%20Ref%20Callback%EF%BC%9A%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/&title=React Ref Callback：最佳实践"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://yaesakuras.github.io/2023/03/11/React%20Ref%20Callback%EF%BC%9A%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/&title=React Ref Callback：最佳实践"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://yaesakuras.github.io/2023/03/11/React%20Ref%20Callback%EF%BC%9A%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/&title=React Ref Callback：最佳实践"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://yaesakuras.github.io/2023/03/11/React%20Ref%20Callback%EF%BC%9A%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/&title=React Ref Callback：最佳实践"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://yaesakuras.github.io/2023/03/11/React%20Ref%20Callback%EF%BC%9A%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/&name=React Ref Callback：最佳实践&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://yaesakuras.github.io/2023/03/11/React%20Ref%20Callback%EF%BC%9A%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/&t=React Ref Callback：最佳实践"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2023
+    grafield
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+ 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script> 
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script> 
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="far fa-clone"></i>';
+    btn += '</span>'; 
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Google Analytics -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Umami Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

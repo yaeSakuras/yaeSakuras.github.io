@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="最近冲浪🏄看到去年 BeJS conf 中一个关于 react 相关的视频，标题是 Goodbye, useEffect。然后又联想到新版 react doc 中有一节标题是 You Might Not Need an Effect，确实有必要再来看看这个 useEffect。  背景useEffect 相信写 react 同学不会陌生几乎每天都会与它打交道，在项目中也会大量使用它但是过多的 u">
+<meta property="og:type" content="article">
+<meta property="og:title" content="你可能并不需要 useEffect">
+<meta property="og:url" content="https://yaesakuras.github.io/2023/02/18/%E4%BD%A0%E5%8F%AF%E8%83%BD%E5%B9%B6%E4%B8%8D%E9%9C%80%E8%A6%81useEffect/index.html">
+<meta property="og:site_name" content="Teyvat">
+<meta property="og:description" content="最近冲浪🏄看到去年 BeJS conf 中一个关于 react 相关的视频，标题是 Goodbye, useEffect。然后又联想到新版 react doc 中有一节标题是 You Might Not Need an Effect，确实有必要再来看看这个 useEffect。  背景useEffect 相信写 react 同学不会陌生几乎每天都会与它打交道，在项目中也会大量使用它但是过多的 u">
+<meta property="og:locale">
+<meta property="og:image" content="https://zzh-cat.oss-cn-beijing.aliyuncs.com/assets/2023-02-19-01.jpg">
+<meta property="og:image" content="https://zzh-cat.oss-cn-beijing.aliyuncs.com/assets/2023-02-19-02.jpg">
+<meta property="article:published_time" content="2023-02-18T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-02-18T16:00:00.000Z">
+<meta property="article:author" content="grafield">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://zzh-cat.oss-cn-beijing.aliyuncs.com/assets/2023-02-19-01.jpg">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>你可能并不需要 useEffect</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2023/02/19/Mac%20OS%E4%B8%8BWireGuard%E5%AE%A2%E6%88%B7%E7%AB%AF%E7%9A%84%E5%AE%89%E8%A3%85%E4%B8%8E%E9%85%8D%E7%BD%AE%E4%BD%BF%E7%94%A8/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://yaesakuras.github.io/2023/02/18/%E4%BD%A0%E5%8F%AF%E8%83%BD%E5%B9%B6%E4%B8%8D%E9%9C%80%E8%A6%81useEffect/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://yaesakuras.github.io/2023/02/18/%E4%BD%A0%E5%8F%AF%E8%83%BD%E5%B9%B6%E4%B8%8D%E9%9C%80%E8%A6%81useEffect/&text=你可能并不需要 useEffect"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://yaesakuras.github.io/2023/02/18/%E4%BD%A0%E5%8F%AF%E8%83%BD%E5%B9%B6%E4%B8%8D%E9%9C%80%E8%A6%81useEffect/&title=你可能并不需要 useEffect"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://yaesakuras.github.io/2023/02/18/%E4%BD%A0%E5%8F%AF%E8%83%BD%E5%B9%B6%E4%B8%8D%E9%9C%80%E8%A6%81useEffect/&is_video=false&description=你可能并不需要 useEffect"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=你可能并不需要 useEffect&body=Check out this article: https://yaesakuras.github.io/2023/02/18/%E4%BD%A0%E5%8F%AF%E8%83%BD%E5%B9%B6%E4%B8%8D%E9%9C%80%E8%A6%81useEffect/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://yaesakuras.github.io/2023/02/18/%E4%BD%A0%E5%8F%AF%E8%83%BD%E5%B9%B6%E4%B8%8D%E9%9C%80%E8%A6%81useEffect/&title=你可能并不需要 useEffect"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://yaesakuras.github.io/2023/02/18/%E4%BD%A0%E5%8F%AF%E8%83%BD%E5%B9%B6%E4%B8%8D%E9%9C%80%E8%A6%81useEffect/&title=你可能并不需要 useEffect"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://yaesakuras.github.io/2023/02/18/%E4%BD%A0%E5%8F%AF%E8%83%BD%E5%B9%B6%E4%B8%8D%E9%9C%80%E8%A6%81useEffect/&title=你可能并不需要 useEffect"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://yaesakuras.github.io/2023/02/18/%E4%BD%A0%E5%8F%AF%E8%83%BD%E5%B9%B6%E4%B8%8D%E9%9C%80%E8%A6%81useEffect/&title=你可能并不需要 useEffect"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://yaesakuras.github.io/2023/02/18/%E4%BD%A0%E5%8F%AF%E8%83%BD%E5%B9%B6%E4%B8%8D%E9%9C%80%E8%A6%81useEffect/&name=你可能并不需要 useEffect&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://yaesakuras.github.io/2023/02/18/%E4%BD%A0%E5%8F%AF%E8%83%BD%E5%B9%B6%E4%B8%8D%E9%9C%80%E8%A6%81useEffect/&t=你可能并不需要 useEffect"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%83%8C%E6%99%AF"><span class="toc-number">1.</span> <span class="toc-text">背景</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF-useEffect"><span class="toc-number">2.</span> <span class="toc-text">什么是 useEffect</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%A0%E4%BB%A5%E4%B8%BA%E4%BD%A0%E5%86%99%E7%9A%84-useEffect"><span class="toc-number">2.1.</span> <span class="toc-text">你以为你写的 useEffect</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%9E%E9%99%85%E7%9A%84-useEffect"><span class="toc-number">2.2.</span> <span class="toc-text">实际的 useEffect</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%A0%E5%8F%AF%E8%83%BD%E4%B8%8D%E9%9C%80%E8%A6%81-useEffect"><span class="toc-number">3.</span> <span class="toc-text">你可能不需要 useEffect</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%A0%E4%B8%8D%E9%9C%80%E8%A6%81-useEffect-%E6%9D%A5%E8%BD%AC%E6%8D%A2%E6%95%B0%E6%8D%AE"><span class="toc-number">3.1.</span> <span class="toc-text">你不需要 useEffect 来转换数据</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9C%A8%E4%BA%8B%E4%BB%B6%E5%A4%84%E7%90%86%E7%A8%8B%E5%BA%8F%E4%B9%8B%E9%97%B4%E5%85%B1%E4%BA%AB%E9%80%BB%E8%BE%91"><span class="toc-number">3.2.</span> <span class="toc-text">在事件处理程序之间共享逻辑</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%A2%E9%98%85%E5%A4%96%E9%83%A8%E5%AD%98%E5%82%A8"><span class="toc-number">3.3.</span> <span class="toc-text">订阅外部存储</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%8E%B7%E5%8F%96%E6%95%B0%E6%8D%AE"><span class="toc-number">3.4.</span> <span class="toc-text">获取数据</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%A0%E4%B8%8D%E9%9C%80%E8%A6%81-useEffect-%E6%9D%A5%E5%88%9D%E5%A7%8B%E5%8C%96%E5%BA%94%E7%94%A8"><span class="toc-number">3.5.</span> <span class="toc-text">你不需要 useEffect 来初始化应用</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5"><span class="toc-number">4.</span> <span class="toc-text">参考链接</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        你可能并不需要 useEffect
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">grafield</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2023-02-18T16:00:00.000Z" itemprop="datePublished">2023-02-19</time>
+        
+      
+    </div>
+
+
+      
+
+      
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <p>最近冲浪🏄看到去年 <a target="_blank" rel="noopener" href="https://www.bejs.io/">BeJS</a> conf 中一个关于 react 相关的视频，标题是 <strong>Goodbye, useEffect</strong>。然后又联想到新版 react doc 中有一节标题是 <strong>You Might Not Need an Effect</strong>，确实有必要再来看看这个 <code>useEffect</code>。 </p>
+<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p><code>useEffect</code> 相信写 react 同学不会陌生几乎每天都会与它打交道，在项目中也会大量使用它但是过多的 <code>useEffect</code> 也会让我们的代码变得混乱和难以维护（心智模型）。</p>
+<h2 id="什么是-useEffect"><a href="#什么是-useEffect" class="headerlink" title="什么是 useEffect"></a>什么是 useEffect</h2><p>我们看最新官方文档对于 <code>useEffect</code> 定义：<a target="_blank" rel="noopener" href="https://beta.reactjs.org/reference/react/useEffect">useEffect</a> 是一个 React Hook，它允许您将组件与外部系统同步。没错最新的文档已经重新定义了 <code>useEffect</code>。</p>
+<blockquote>
+<p>旧版 <code>useEffect</code> 定义：<a target="_blank" rel="noopener" href="https://zh-hans.reactjs.org/docs/hooks-overview.html#effect-hook">useEffect</a> 就是一个 Effect Hook，给函数组件增加了操作副作用的能力。它跟 <code>class</code> 组件中的 <code>componentDidMount</code>、<code>componentDidUpdate</code> 和 <code>componentWillUnmount</code> 具有相同的用途，只不过被合并成了一个 API。</p>
+</blockquote>
+<p>新版的定义不在强调生命周期的作用（虽然可以这么使用），而是重点在<strong>组件与外部系统同步</strong>。</p>
+<p><img src="https://zzh-cat.oss-cn-beijing.aliyuncs.com/assets/2023-02-19-01.jpg"></p>
+<h3 id="你以为你写的-useEffect"><a href="#你以为你写的-useEffect" class="headerlink" title="你以为你写的 useEffect"></a>你以为你写的 useEffect</h3><figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="title function_">useEffect</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="title function_">doSomething</span>()</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="function">() =&gt;</span> <span class="title function_">cleanup</span>()</span><br><span class="line">&#125;, [whenever, these, things, change])</span><br></pre></td></tr></table></figure>
+
+<h3 id="实际的-useEffect"><a href="#实际的-useEffect" class="headerlink" title="实际的 useEffect"></a>实际的 useEffect</h3><figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="title function_">useEffect</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (foo &amp;&amp; bar &amp;&amp; (baz || quo)) &#123;</span><br><span class="line">        <span class="title function_">doSomething</span>()</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="title function_">doSomethingElse</span>()</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// oops, forgot the cleanup</span></span><br><span class="line">&#125;, [foo, bar, baz, quo])</span><br></pre></td></tr></table></figure>
+
+<h2 id="你可能不需要-useEffect"><a href="#你可能不需要-useEffect" class="headerlink" title="你可能不需要 useEffect"></a>你可能不需要 useEffect</h2><p>我们看看 dan 大佬是如何描述：</p>
+<p><img src="https://zzh-cat.oss-cn-beijing.aliyuncs.com/assets/2023-02-19-02.jpg"></p>
+<p><code>useEffect</code> 是一种将 React 与一些外部系统(网络、订阅、DOM)同步的方法。如果你没有任何外部系统，只是试图用 <code>useEffect</code> 管理数据流，你就会遇到问题。</p>
+<p>而且在最新的 React 18 中如果开启 <code>Strict Mode</code>，<a target="_blank" rel="noopener" href="https://beta.reactjs.org/reference/react/useEffect#my-effect-runs-twice-when-the-component-mounts">useEffect</a> 会在组件挂在的时候运行 2 次。</p>
+<h3 id="你不需要-useEffect-来转换数据"><a href="#你不需要-useEffect-来转换数据" class="headerlink" title="你不需要 useEffect 来转换数据"></a>你不需要 useEffect 来转换数据</h3><blockquote>
+<p><code>useEffect</code> ➡️<code>useMemo</code></p>
+</blockquote>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="title function_">Cart</span> = (<span class="params"></span>) =&gt; &#123;</span><br><span class="line">  <span class="keyword">const</span> [items, setItems] = <span class="title function_">useState</span>([])</span><br><span class="line">  <span class="keyword">const</span> [total, setTotal] = <span class="title function_">useState</span>(<span class="number">0</span>)</span><br><span class="line"></span><br><span class="line">  <span class="title function_">useEffect</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="title function_">setTotal</span>(</span><br><span class="line">        items.<span class="title function_">reduce</span>(<span class="function">(<span class="params">currentTotal, item</span>) =&gt;</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> currentTotal + item.<span class="property">price</span></span><br><span class="line">        &#125;, <span class="number">0</span>)</span><br><span class="line">    )</span><br><span class="line">  &#125;, [items])</span><br><span class="line"></span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上面代码使用 <code>useEffect</code> 来进行数据的转化，效率很低。当某些东西可以从现有的道具或状态计算出来时，不要把它放在状态中。相反，应该在渲染过程中计算它。</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="title function_">Cart</span> = (<span class="params"></span>) =&gt; &#123;</span><br><span class="line">  <span class="keyword">const</span> [items, setItems] = <span class="title function_">useState</span>([])</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> total = items.<span class="title function_">reduce</span>(<span class="function">(<span class="params">currentTotal, item</span>) =&gt;</span> &#123;</span><br><span class="line">      <span class="keyword">return</span> currentTotal + item.<span class="property">price</span></span><br><span class="line">  &#125;, <span class="number">0</span>)</span><br><span class="line"></span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果是昂贵的计算数据，可以使用 <code>useMemo</code> 代替</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="title function_">Cart</span> = (<span class="params"></span>) =&gt; &#123;</span><br><span class="line">  <span class="keyword">const</span> [items, setItems] = <span class="title function_">useState</span>([])</span><br><span class="line">  <span class="keyword">const</span> total = <span class="title function_">useMemo</span>(</span><br><span class="line">      <span class="function">() =&gt;</span> items.<span class="title function_">reduce</span>(<span class="function">(<span class="params">currentTotal, item</span>) =&gt;</span> &#123;</span><br><span class="line">      <span class="keyword">return</span> currentTotal + item.<span class="property">price</span></span><br><span class="line">  &#125;, <span class="number">0</span>), </span><br><span class="line">  [items])</span><br><span class="line"></span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="在事件处理程序之间共享逻辑"><a href="#在事件处理程序之间共享逻辑" class="headerlink" title="在事件处理程序之间共享逻辑"></a>在事件处理程序之间共享逻辑</h3><blockquote>
+<p><code>useEffect</code> ➡️<code>eventhandler</code> </p>
+</blockquote>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="title function_">Product</span> = (<span class="params">&#123; onOpen, onClose &#125;</span>) =&gt; &#123;</span><br><span class="line">  <span class="keyword">const</span> [isOpen, setIsOpen] = <span class="title function_">useState</span>(<span class="literal">false</span>)</span><br><span class="line"></span><br><span class="line">  <span class="title function_">useEffect</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (isOpen) &#123;</span><br><span class="line">      <span class="title function_">onOpen</span>()</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="title function_">onClose</span>()</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;, [isOpen])</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> (</span><br><span class="line">    <span class="language-xml"><span class="tag">&lt;<span class="name">div</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">      <span class="tag">&lt;<span class="name">button</span></span></span></span><br><span class="line"><span class="tag"><span class="language-xml">        <span class="attr">onClick</span>=<span class="string">&#123;()</span> =&gt;</span> &#123;</span></span><br><span class="line"><span class="language-xml">          setIsOpen(!isOpen)</span></span><br><span class="line"><span class="language-xml">        &#125;&#125;</span></span><br><span class="line"><span class="language-xml">      &gt;</span></span><br><span class="line"><span class="language-xml">        Toggle quick view</span></span><br><span class="line"><span class="language-xml">      <span class="tag">&lt;/<span class="name">button</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line">  )</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在事件处理程序之间共享逻辑，更好的方式，可以使用事件处理函数：</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="title function_">Product</span> = (<span class="params">&#123; onOpen, onClose &#125;</span>) =&gt; &#123;</span><br><span class="line">  <span class="keyword">const</span> [isOpen, setIsOpen] = <span class="title function_">useState</span>(<span class="literal">false</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">toggleView</span> = (<span class="params"></span>) =&gt; &#123;</span><br><span class="line">  <span class="keyword">const</span> nextIsOpen = !isOpen</span><br><span class="line">  <span class="title function_">setIsOpen</span>(nextIsOpen)</span><br><span class="line">  <span class="keyword">if</span> (nextIsOpen) &#123;</span><br><span class="line">    <span class="title function_">onOpen</span>()</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="title function_">onClose</span>()</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> (</span><br><span class="line">    <span class="language-xml"><span class="tag">&lt;<span class="name">div</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">      <span class="tag">&lt;<span class="name">button</span> <span class="attr">onClick</span>=<span class="string">&#123;toggleView&#125;</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">        Toggle quick view</span></span><br><span class="line"><span class="language-xml">      <span class="tag">&lt;/<span class="name">button</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line">  )</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="订阅外部存储"><a href="#订阅外部存储" class="headerlink" title="订阅外部存储"></a>订阅外部存储</h3><blockquote>
+<p><code>useEffect</code> ➡️<code>useSyncExternalStore</code> </p>
+</blockquote>
+<p>在以前我们都是在 <code>useEffect</code> 中添加 <code>EventListener</code> 相关的逻辑：</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">useOnlineStatus</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="comment">// Not ideal: Manual store subscription in an Effect</span></span><br><span class="line">  <span class="keyword">const</span> [isOnline, setIsOnline] = <span class="title function_">useState</span>(<span class="literal">true</span>);</span><br><span class="line">  <span class="title function_">useEffect</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">function</span> <span class="title function_">updateState</span>(<span class="params"></span>) &#123;</span><br><span class="line">      <span class="title function_">setIsOnline</span>(navigator.<span class="property">onLine</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="title function_">updateState</span>();</span><br><span class="line"></span><br><span class="line">    <span class="variable language_">window</span>.<span class="title function_">addEventListener</span>(<span class="string">&#x27;online&#x27;</span>, updateState);</span><br><span class="line">    <span class="variable language_">window</span>.<span class="title function_">addEventListener</span>(<span class="string">&#x27;offline&#x27;</span>, updateState);</span><br><span class="line">    <span class="keyword">return</span> <span class="function">() =&gt;</span> &#123;</span><br><span class="line">      <span class="variable language_">window</span>.<span class="title function_">removeEventListener</span>(<span class="string">&#x27;online&#x27;</span>, updateState);</span><br><span class="line">      <span class="variable language_">window</span>.<span class="title function_">removeEventListener</span>(<span class="string">&#x27;offline&#x27;</span>, updateState);</span><br><span class="line">    &#125;;</span><br><span class="line">  &#125;, []);</span><br><span class="line">  <span class="keyword">return</span> isOnline;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在 react18 中提供一个更好的方式 <code>useSyncExternalStore</code>，它专门处理类似 <code>EventListener</code> 相关的逻辑：</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">subscribe</span>(<span class="params">callback</span>) &#123;</span><br><span class="line">  <span class="variable language_">window</span>.<span class="title function_">addEventListener</span>(<span class="string">&#x27;online&#x27;</span>, callback);</span><br><span class="line">  <span class="variable language_">window</span>.<span class="title function_">addEventListener</span>(<span class="string">&#x27;offline&#x27;</span>, callback);</span><br><span class="line">  <span class="keyword">return</span> <span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="variable language_">window</span>.<span class="title function_">removeEventListener</span>(<span class="string">&#x27;online&#x27;</span>, callback);</span><br><span class="line">    <span class="variable language_">window</span>.<span class="title function_">removeEventListener</span>(<span class="string">&#x27;offline&#x27;</span>, callback);</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">useOnlineStatus</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="comment">// ✅ Good: Subscribing to an external store with a built-in Hook</span></span><br><span class="line">  <span class="keyword">return</span> <span class="title function_">useSyncExternalStore</span>(</span><br><span class="line">    subscribe, <span class="comment">// React won&#x27;t resubscribe for as long as you pass the same function</span></span><br><span class="line">    <span class="function">() =&gt;</span> navigator.<span class="property">onLine</span>, <span class="comment">// How to get the value on the client</span></span><br><span class="line">    <span class="function">() =&gt;</span> <span class="literal">true</span> <span class="comment">// How to get the value on the server</span></span><br><span class="line">  );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="获取数据"><a href="#获取数据" class="headerlink" title="获取数据"></a>获取数据</h3><blockquote>
+<p><code>useEffect</code> ➡️<code>renderAsYouFetch</code></p>
+</blockquote>
+<p>通常我们直接通过 <code>useEffect</code> 来获取数据:</p>
+ <figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">SearchResults</span>(<span class="params">&#123; query &#125;</span>) &#123;</span><br><span class="line">    <span class="keyword">const</span> [results, setResults] = <span class="title function_">useState</span>([]);</span><br><span class="line">    <span class="keyword">const</span> [page, setPage] = <span class="title function_">useState</span>(<span class="number">1</span>);</span><br><span class="line">    <span class="title function_">useEffect</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">        <span class="keyword">let</span> ignore = <span class="literal">false</span>;</span><br><span class="line">        <span class="title function_">fetchResults</span>(query, page).<span class="title function_">then</span>(<span class="function"><span class="params">json</span> =&gt;</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (!ignore) &#123;</span><br><span class="line">                <span class="title function_">setResults</span>(json);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">        <span class="keyword">return</span> <span class="function">() =&gt;</span> &#123;</span><br><span class="line">            ignore = <span class="literal">true</span>;</span><br><span class="line">        &#125;;</span><br><span class="line">    &#125;, [query, page]);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">function</span> <span class="title function_">handleNextPageClick</span>(<span class="params"></span>) &#123;</span><br><span class="line">        <span class="title function_">setPage</span>(page + <span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里我们提取出一个 hooks 然后在组件中调用这个 hooks 来达到获取数据的目的：</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">useData</span>(<span class="params">url</span>) &#123;</span><br><span class="line">    <span class="keyword">const</span> [data, setData] = <span class="title function_">useState</span>(<span class="literal">null</span>);</span><br><span class="line">    <span class="title function_">useEffect</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">        <span class="keyword">let</span> ignore = <span class="literal">false</span>;</span><br><span class="line">        <span class="title function_">fetch</span>(url)</span><br><span class="line">            .<span class="title function_">then</span>(<span class="function"><span class="params">response</span> =&gt;</span> response.<span class="title function_">json</span>())</span><br><span class="line">            .<span class="title function_">then</span>(<span class="function"><span class="params">json</span> =&gt;</span> &#123;</span><br><span class="line">                <span class="keyword">if</span> (!ignore) &#123;</span><br><span class="line">                    <span class="title function_">setData</span>(json);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;);</span><br><span class="line">        <span class="keyword">return</span> <span class="function">() =&gt;</span> &#123;</span><br><span class="line">            ignore = <span class="literal">true</span>;</span><br><span class="line">        &#125;;</span><br><span class="line">    &#125;, [url]);</span><br><span class="line">    <span class="keyword">return</span> data;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">SearchResults</span>(<span class="params">&#123; query &#125;</span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> [page, setPage] = <span class="title function_">useState</span>(<span class="number">1</span>);</span><br><span class="line">  <span class="keyword">const</span> params = <span class="keyword">new</span> <span class="title class_">URLSearchParams</span>(&#123; query, page &#125;);</span><br><span class="line">  <span class="keyword">const</span> results = <span class="title function_">useData</span>(<span class="string">`/api/search?<span class="subst">$&#123;params&#125;</span>`</span>);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">function</span> <span class="title function_">handleNextPageClick</span>(<span class="params"></span>) &#123;</span><br><span class="line">    <span class="title function_">setPage</span>(page + <span class="number">1</span>);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>虽然单独使用这种方法不会像使用框架内置的数据获取机制那样高效，但是将数据获取逻辑移动到自定义 hooks 中将使之更容易在以后采用高效的数据获取策略。</p>
+<h3 id="你不需要-useEffect-来初始化应用"><a href="#你不需要-useEffect-来初始化应用" class="headerlink" title="你不需要 useEffect 来初始化应用"></a>你不需要 useEffect 来初始化应用</h3><blockquote>
+<p><code>useEffect</code> ➡️<code>justCallIt</code></p>
+</blockquote>
+<p>通常我们都会使用 <code>useEffect</code> 来初始化我们的应用：</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">App</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="comment">// 🔴 Avoid: Effects with logic that should only ever run once</span></span><br><span class="line">  <span class="title function_">useEffect</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="title function_">loadDataFromLocalStorage</span>();</span><br><span class="line">    <span class="title function_">checkAuthToken</span>();</span><br><span class="line">  &#125;, []);</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然而 react18 会运行 2 次这个我们之前也说过，所以在模块初始化期间和应用程序呈现之前运行它</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (<span class="keyword">typeof</span> <span class="variable language_">window</span> !== <span class="string">&#x27;undefined&#x27;</span>) &#123; <span class="comment">// Check if we&#x27;re running in the browser.</span></span><br><span class="line">   <span class="comment">// ✅ Only runs once per app load</span></span><br><span class="line">  <span class="title function_">checkAuthToken</span>();</span><br><span class="line">  <span class="title function_">loadDataFromLocalStorage</span>();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">App</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>以上所述内容我们可能不需要 <code>useEffect</code>，当然这里也只是简单说明更多内容可以查看官方文档 <a target="_blank" rel="noopener" href="https://beta.reactjs.org/learn/you-might-not-need-an-effect">You Might Not Need an Effect</a></p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=bGzanfKVFeU">Goodbye, useEffect</a></li>
+<li><a target="_blank" rel="noopener" href="https://beta.reactjs.org/learn/you-might-not-need-an-effect">You Might Not Need an Effect</a></li>
+</ul>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%83%8C%E6%99%AF"><span class="toc-number">1.</span> <span class="toc-text">背景</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF-useEffect"><span class="toc-number">2.</span> <span class="toc-text">什么是 useEffect</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%A0%E4%BB%A5%E4%B8%BA%E4%BD%A0%E5%86%99%E7%9A%84-useEffect"><span class="toc-number">2.1.</span> <span class="toc-text">你以为你写的 useEffect</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%9E%E9%99%85%E7%9A%84-useEffect"><span class="toc-number">2.2.</span> <span class="toc-text">实际的 useEffect</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%A0%E5%8F%AF%E8%83%BD%E4%B8%8D%E9%9C%80%E8%A6%81-useEffect"><span class="toc-number">3.</span> <span class="toc-text">你可能不需要 useEffect</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%A0%E4%B8%8D%E9%9C%80%E8%A6%81-useEffect-%E6%9D%A5%E8%BD%AC%E6%8D%A2%E6%95%B0%E6%8D%AE"><span class="toc-number">3.1.</span> <span class="toc-text">你不需要 useEffect 来转换数据</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9C%A8%E4%BA%8B%E4%BB%B6%E5%A4%84%E7%90%86%E7%A8%8B%E5%BA%8F%E4%B9%8B%E9%97%B4%E5%85%B1%E4%BA%AB%E9%80%BB%E8%BE%91"><span class="toc-number">3.2.</span> <span class="toc-text">在事件处理程序之间共享逻辑</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%A2%E9%98%85%E5%A4%96%E9%83%A8%E5%AD%98%E5%82%A8"><span class="toc-number">3.3.</span> <span class="toc-text">订阅外部存储</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%8E%B7%E5%8F%96%E6%95%B0%E6%8D%AE"><span class="toc-number">3.4.</span> <span class="toc-text">获取数据</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%A0%E4%B8%8D%E9%9C%80%E8%A6%81-useEffect-%E6%9D%A5%E5%88%9D%E5%A7%8B%E5%8C%96%E5%BA%94%E7%94%A8"><span class="toc-number">3.5.</span> <span class="toc-text">你不需要 useEffect 来初始化应用</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5"><span class="toc-number">4.</span> <span class="toc-text">参考链接</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://yaesakuras.github.io/2023/02/18/%E4%BD%A0%E5%8F%AF%E8%83%BD%E5%B9%B6%E4%B8%8D%E9%9C%80%E8%A6%81useEffect/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://yaesakuras.github.io/2023/02/18/%E4%BD%A0%E5%8F%AF%E8%83%BD%E5%B9%B6%E4%B8%8D%E9%9C%80%E8%A6%81useEffect/&text=你可能并不需要 useEffect"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://yaesakuras.github.io/2023/02/18/%E4%BD%A0%E5%8F%AF%E8%83%BD%E5%B9%B6%E4%B8%8D%E9%9C%80%E8%A6%81useEffect/&title=你可能并不需要 useEffect"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://yaesakuras.github.io/2023/02/18/%E4%BD%A0%E5%8F%AF%E8%83%BD%E5%B9%B6%E4%B8%8D%E9%9C%80%E8%A6%81useEffect/&is_video=false&description=你可能并不需要 useEffect"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=你可能并不需要 useEffect&body=Check out this article: https://yaesakuras.github.io/2023/02/18/%E4%BD%A0%E5%8F%AF%E8%83%BD%E5%B9%B6%E4%B8%8D%E9%9C%80%E8%A6%81useEffect/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://yaesakuras.github.io/2023/02/18/%E4%BD%A0%E5%8F%AF%E8%83%BD%E5%B9%B6%E4%B8%8D%E9%9C%80%E8%A6%81useEffect/&title=你可能并不需要 useEffect"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://yaesakuras.github.io/2023/02/18/%E4%BD%A0%E5%8F%AF%E8%83%BD%E5%B9%B6%E4%B8%8D%E9%9C%80%E8%A6%81useEffect/&title=你可能并不需要 useEffect"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://yaesakuras.github.io/2023/02/18/%E4%BD%A0%E5%8F%AF%E8%83%BD%E5%B9%B6%E4%B8%8D%E9%9C%80%E8%A6%81useEffect/&title=你可能并不需要 useEffect"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://yaesakuras.github.io/2023/02/18/%E4%BD%A0%E5%8F%AF%E8%83%BD%E5%B9%B6%E4%B8%8D%E9%9C%80%E8%A6%81useEffect/&title=你可能并不需要 useEffect"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://yaesakuras.github.io/2023/02/18/%E4%BD%A0%E5%8F%AF%E8%83%BD%E5%B9%B6%E4%B8%8D%E9%9C%80%E8%A6%81useEffect/&name=你可能并不需要 useEffect&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://yaesakuras.github.io/2023/02/18/%E4%BD%A0%E5%8F%AF%E8%83%BD%E5%B9%B6%E4%B8%8D%E9%9C%80%E8%A6%81useEffect/&t=你可能并不需要 useEffect"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2023
+    grafield
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+ 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script> 
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script> 
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="far fa-clone"></i>';
+    btn += '</span>'; 
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Google Analytics -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Umami Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>
